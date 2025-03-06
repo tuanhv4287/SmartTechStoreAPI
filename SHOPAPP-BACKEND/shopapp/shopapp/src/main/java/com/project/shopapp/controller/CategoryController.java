@@ -3,7 +3,6 @@ package com.project.shopapp.controller;
 import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.CategoryDTO;
 import com.project.shopapp.models.Category;
-import com.project.shopapp.services.CategoryService;
 import com.project.shopapp.services.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

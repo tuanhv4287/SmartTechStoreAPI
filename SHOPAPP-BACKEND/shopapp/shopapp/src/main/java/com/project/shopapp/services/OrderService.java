@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,8 +31,9 @@ public class OrderService implements IOrderService{
     @Override
     @Transactional
     public Order createOrder(OrderDTO orderDTO) throws Exception {
+        Long userId = Long.parseLong(orderDTO.getUserId());
         User user = userRepository
-                .findById(orderDTO.getUserId())
+                .findById(userId)
                 .orElseThrow(()->new DataNotFoundException("cannot find user with id"+ orderDTO.getUserId()));
         modelMapper.typeMap(OrderDTO.class,Order.class)
                 .addMappings(mapper -> mapper.skip(Order::setId));
@@ -81,7 +81,8 @@ public class OrderService implements IOrderService{
             throws DataNotFoundException {
         Order order = orderRepository.findById(id)
                 .orElseThrow(()-> new DataNotFoundException("Cannot find order by id"+ id));
-        User esixtingUser = userRepository.findById(orderDTO.getUserId())
+        Long userId = Long.parseLong(orderDTO.getUserId());
+        User esixtingUser = userRepository.findById(userId)
                 .orElseThrow(()-> new DataNotFoundException("Cannot find user  by id"+ id));
         modelMapper.typeMap(OrderDTO.class, Order.class)
                 .addMappings(mapper->mapper.skip(Order::setId));

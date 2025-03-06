@@ -1,7 +1,6 @@
 package com.project.shopapp.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.util.Date;

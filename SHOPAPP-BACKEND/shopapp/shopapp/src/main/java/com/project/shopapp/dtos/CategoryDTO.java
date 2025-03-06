@@ -1,6 +1,5 @@
 package com.project.shopapp.dtos;
 
-import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 

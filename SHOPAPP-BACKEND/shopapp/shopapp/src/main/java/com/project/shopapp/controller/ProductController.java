@@ -10,10 +10,8 @@ import com.project.shopapp.responses.ProductListReponse;
 import com.project.shopapp.responses.ProductResponse;
 import com.project.shopapp.services.IProductService;
 import com.project.shopapp.utils.MessageKeys;
-import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.util.StringUtil;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +24,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -158,7 +155,13 @@ public class ProductController {
         );
         Page<ProductResponse> productPage = productService.getAllProducts(keyword,category_id,pageRequest);
         int totalPages = productPage.getTotalPages();
+
+
         List<ProductResponse> products = productPage.getContent();
+        if (products.isEmpty()) {
+            // Bạn có thể thêm log ở đây để kiểm tra thêm
+            System.out.println("No products found.");
+        }
         return ResponseEntity.ok(ProductListReponse.builder()
                         .products(products)
                         .totalPages(totalPages)
@@ -220,7 +223,7 @@ public class ProductController {
                     .price((float)faker.number().numberBetween(10,90_000_000))
                     .description(faker.lorem().sentence())
                     .thumbnail("")
-                    .categoryId((long)faker.number().numberBetween(3, 6))
+                    .categoryId((long)faker.number().numberBetween(1, 4))
                     .build();
             try {
                 productService.createProduct(productDTO);

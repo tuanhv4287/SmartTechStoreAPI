@@ -5,6 +5,7 @@ import com.project.shopapp.components.LocalizationUtils;
 import com.project.shopapp.dtos.*;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.PermissionDenyException;
+import com.project.shopapp.models.Order;
 import com.project.shopapp.models.Role;
 import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.RoleRepository;
@@ -13,6 +14,8 @@ import com.project.shopapp.utils.MessageKeys;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +37,8 @@ public class UserService implements IUserService {
     public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new DataIntegrityViolationException("Phone number already exists");
+//            throw new DataIntegrityViolationException("Phone number already exists");
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.PHONE_ALREADY_EXISTS));
         }
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException("Role not found"));
@@ -103,7 +107,7 @@ public class UserService implements IUserService {
     public String login(String phoneNumber, String password, Long roleId) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if(optionalUser.isEmpty()){
-            throw new DataNotFoundException("Invalid phone number / password");
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
         }
 //        return optionalUser.get();
         User existingUser = optionalUser.get();
@@ -111,7 +115,7 @@ public class UserService implements IUserService {
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() == 0) {
             if(!passwordEncoder.matches(password, existingUser.getPassword())){
-                throw new BadCredentialsException("Wrong phone number or password");
+                throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
             }
 
         }
@@ -141,4 +145,19 @@ public class UserService implements IUserService {
             throw new Exception("User not found");
         }
     }
+    @Override
+    public Page<User> getUserByKeyword(String keyword, Pageable pageable) {
+        return userRepository.findByKeyword(keyword, pageable);
+    }
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null){
+            user.setActive(false);
+            userRepository.save(user);
+        }
+    }
+
+
 }
