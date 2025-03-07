@@ -116,10 +116,11 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserListResponse> getUsersByKeyword(
             @RequestParam(defaultValue = "", required = false) String keyword,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("id").ascending());
+        int pageIndex = page - 1;
+        PageRequest pageRequest = PageRequest.of(pageIndex, limit, Sort.by("id").ascending());
         Page<UserResponse> userPage =userService.getUserByKeyword(keyword, pageRequest)
                 .map(UserResponse::fromUser);
         int totalPages = userPage.getTotalPages();

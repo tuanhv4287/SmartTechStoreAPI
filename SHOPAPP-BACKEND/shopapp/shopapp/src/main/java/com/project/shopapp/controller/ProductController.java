@@ -145,11 +145,12 @@ public class ProductController {
     public ResponseEntity<ProductListReponse> getProducts(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0", name = "category_id") Long category_id,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int limit
     ) {
+        int pageIndex = page - 1;
         PageRequest pageRequest = PageRequest.of(
-                page, limit,
+                pageIndex, limit,
 //                Sort.by("createdAt").descending());
         Sort.by("id").ascending()
         );
